@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.0/axios.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="X-UA-Compatible" content="ie=edg">
+<link href="{{ url_for('static', path='/css/index.css') }}" rel="stylesheet">
+<title>空调</title>
+<style type="text/css">
+ body { background-image:url('{{ url_for('static', path='pic/0.png') }}');background-attachment:fixed;background-size:100% 100%  ; }
+</style>
+</head>
+<body>
+    <h1 style="position:absolute;left:200px;top:80px;color: #111110;">当前室内情况：</h1>
+    <h3 style="position:absolute;left:100px;top:140px;color: #111110;">日期：{{ local_time }}</h3>
+    <h3 style="position:absolute;left:100px;top:180px;color: #111110;">(AHT10)温度：{{AHT10_temp}}&deg;C</h3>
+    <h3 style="position:absolute;left:100px;top:220px;color: #111110;">湿度：{{AHT10_hum}} %hc</h3>
+    <h3 style="position:absolute;left:100px;top:260px;color: #111110;">(BMP180)温度：{{temperature}}&deg;C</h3>
+    <h3 style="position:absolute;left:100px;top:300px;color: #111110;">大气压：{{pressure}} pa</h3>
+    <h3 style="position:absolute;left:100px;top:340px;color:#111110;">光强：{{Light}} lx</h3>
+    <img type="button" onclick="Changemodel1()"  id="modelButton1" value="1" src="{{ url_for('static', path='pic/1.png') }}"  style="position:absolute;left:700px;top:110px;"/>
+    <img type="button" onclick="Changemodel4()"  id="modelButton4" value="4" src="{{ url_for('static', path='pic/2.png') }}"  style="position:absolute;left:800px;top:110px;"/>
+    <img type="button" onclick="Changemodel2()"  id="modelButton2" value="2" src="{{ url_for('static', path='pic/3.png') }}"  style="position:absolute;left:900px;top:110px;"/>
+    <img type="button" onclick="Changemodel3()"  id="modelButton3" value="3" src="{{ url_for('static', path='pic/4.png') }}"  style="position:absolute;left:1000px;top:110px;"/>
+    <img src="{{ url_for('static', path='pic/5.png') }}"  style="position:absolute;left:750px;top:180px;"/>
+    <img type="button" onclick="Changetemp1()"  id="tempButton1" value="1" src="{{ url_for('static', path='pic/6.png') }}"  style="position:absolute;left:850px;top:180px;"/>
+    <img type="button" onclick="Changetemp2()"  id="tempButton2" value="-1" src="{{ url_for('static', path='pic/7.png') }}"  style="position:absolute;left:950px;top:180px;"/>
+    <img src="{{ url_for('static', path='pic/8.png') }}"  style="position:absolute;left:750px;top:250px;"/>
+    <img type="button" onclick="Changespeed1()"  id="speedButton1" value="1" src="{{ url_for('static', path='pic/6.png') }}"  style="position:absolute;left:850px;top:250px;"/>
+    <img type="button" onclick="Changespeed2()"  id="speedButton2" value="-1" src="{{ url_for('static', path='pic/7.png') }}"  style="position:absolute;left:950px;top:250px;"/>
+    <img type="button" onclick="Changelr()" id="lrButton" value="0" src="{{ url_for('static', path='pic/9.png') }}"  style="position:absolute;left:800px;top:320px;"/>
+    <img type="button" onclick="Changeud()" id="udButton" value="0"src="{{ url_for('static', path='pic/10.png') }}"  style="position:absolute;left:900px;top:320px;"/>
+    <button  class="buttonO" type="button" onclick="ChangeOC()" id="myButton" value="0">开启设备</button>
+    <script >
+        function ChangeOC() {
+        var btn = document.getElementById("myButton");
+        if (btn.value == "1") {
+            btn.value = "0";
+            btn.innerHTML = "关闭设备";
+            axios.post("http://192.168.3.254:9000/Model", data = {
+                        Open: "1",
+                        }).then(returndata =>{
+                        console.log(returndata.data)
+                            })
+        }
+        else {
+            btn.value = "1";
+            btn.innerHTML = "开启设备";
+            axios.post("http://192.168.3.254:9000/Model", data = {
+                        Open: "0",
+                        }).then(returndata =>{
+                        console.log(returndata.data)
+                            })
+        }
+        }
+
+        function Changemodel1() {
+            var btn = document.getElementById("modelButton1");
+            axios.post("http://192.168.3.254:9000/Model", data = {
+                        model: "1",
+                        }).then(returndata =>{
+                        console.log(returndata.data)
+                            })
+                }
+        function Changemodel2() {
+            var btn = document.getElementById("modelButton2");
+            axios.post("http://192.168.3.254:9000/Model", data = {
+                        model: "2",
+                        }).then(returndata =>{
+                        console.log(returndata.data)
+                            })
+                }
+        function Changemodel3() {
+            var btn = document.getElementById("modelButton3");
+            axios.post("http://192.168.3.254:9000/Model", data = {
+                        model: "3",
+                        }).then(returndata =>{
+                        console.log(returndata.data)
+                            })
+                }
+        function Changemodel4() {
+            var btn = document.getElementById("modelButton4");
+            axios.post("http://192.168.3.254:9000/Model", data = {
+                        model: "4",
+                        }).then(returndata =>{
+                        console.log(returndata.data)
+                            })
+                }
+        function Changetemp1() {
+            var btn = document.getElementById("tempButton1");
+            axios.post("http://192.168.3.254:9000/Model", data = {
+                        temp: "1",
+                        }).then(returndata =>{
+                        console.log(returndata.data)
+                            })
+                }
+        function Changetemp2() {
+            var btn = document.getElementById("tempButton2");
+            axios.post("http://192.168.3.254:9000/Model", data = {
+                        temp: "-1",
+                        }).then(returndata =>{
+                        console.log(returndata.data)
+                            })
+                }
+         function Changespeed1() {
+            var btn = document.getElementById("tempButton1");
+            axios.post("http://192.168.3.254:9000/Model", data = {
+                       speed: "1",
+                        }).then(returndata =>{
+                        console.log(returndata.data)
+                            })
+                }
+        function Changespeed2() {
+            var btn = document.getElementById("tempButton2");
+            axios.post("http://192.168.3.254:9000/Model", data = {
+                      speed: "-1",
+                        }).then(returndata =>{
+                        console.log(returndata.data)
+                            })
+                }
+        function Changelr() {
+        var btn = document.getElementById("lrButton");
+        if (btn.value == "1") {
+            btn.value = "0";
+            axios.post("http://192.168.3.254:9000/Model", data = {
+                        lr: "0",
+                        }).then(returndata =>{
+                        console.log(returndata.data)
+                            })
+        }
+        else {
+            btn.value = "1";
+            axios.post("http://192.168.3.254:9000/Model", data = {
+                        lr: "1",
+                        }).then(returndata =>{
+                        console.log(returndata.data)
+                            })
+        }
+        }
+        function Changeud() {
+        var btn = document.getElementById("udButton");
+        if (btn.value == "1") {
+            btn.value = "0";
+            axios.post("http://192.168.3.254:9000/Model", data = {
+                        ud: "0",
+                        }).then(returndata =>{
+                        console.log(returndata.data)
+                            })
+        }
+        else {
+            btn.value = "1";
+            axios.post("http://192.168.3.254:9000/Model", data = {
+                        ud: "1",
+                        }).then(returndata =>{
+                        console.log(returndata.data)
+                            })
+        }
+        }
+    </script>
+</body>
+</html>
